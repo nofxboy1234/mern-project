@@ -3,18 +3,22 @@ const express = require('express');
 let db;
 
 const app = express();
+app.set('view engine', 'ejs');
+app.set('views', './views');
+app.use(express.static('public'));
 
 app.get('/', async (req, res) => {
   const allAnimals = await db.collection('animals').find().toArray();
-  res.send(
-    `<h1>Welcome to the page</h1> ${allAnimals
-      .map((animal) => `<p>${animal.name} - ${animal.species}</p>`)
-      .join('')}`
-  );
+  res.render('home', { allAnimals });
 });
 
 app.get('/admin', (req, res) => {
-  res.send('This is the top secret admin page');
+  res.render('admin');
+});
+
+app.get('/api/animals', async (req, res) => {
+  const allAnimals = await db.collection('animals').find().toArray();
+  res.json(allAnimals);
 });
 
 async function start() {
