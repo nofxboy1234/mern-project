@@ -6,8 +6,11 @@ const app = express();
 
 app.get('/', async (req, res) => {
   const allAnimals = await db.collection('animals').find().toArray();
-  console.log(allAnimals);
-  res.send('Welcome to the homepage');
+  res.send(
+    `<h1>Welcome to the page</h1> ${allAnimals
+      .map((animal) => `<p>${animal.name} - ${animal.species}</p>`)
+      .join('')}`
+  );
 });
 
 app.get('/admin', (req, res) => {
