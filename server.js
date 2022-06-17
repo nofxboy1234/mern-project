@@ -70,6 +70,18 @@ app.post(
   }
 );
 
+app.delete('/animal/:id', async (req, res) => {
+  if (typeof req.params.id != 'string') req.params.id = '';
+  const doc = await db
+    .collection('animals')
+    .findOne({ _id: new ObjectId(req.params.id) });
+  if (doc.photo) {
+    fse.remove(path.join('public', 'uploaded-photos', doc.photo));
+  }
+  db.collection('animals').deleteOne({ _id: new ObjectId(req.params.id) });
+  res.send('Good job');
+});
+
 function ourCleanup(req, res, next) {
   if (typeof req.body.name != 'string') req.body.name = '';
   if (typeof req.body.species != 'string') req.body.species = '';
