@@ -1,11 +1,16 @@
 const { MongoClient } = require('mongodb');
 const express = require('express');
+const multer = require('multer');
+const upload = multer();
 let db;
 
 const app = express();
 app.set('view engine', 'ejs');
 app.set('views', './views');
 app.use(express.static('public'));
+
+app.use(express.json());
+app.use(express.urlencoded({ extended: false }));
 
 function passwordProtected(req, res, next) {
   res.set('WWW-Authenticate', "Basic realm='Our MERN App'");
@@ -31,6 +36,11 @@ app.get('/admin', (req, res) => {
 app.get('/api/animals', async (req, res) => {
   const allAnimals = await db.collection('animals').find().toArray();
   res.json(allAnimals);
+});
+
+app.post('/create-animal', upload.single('photo'), async (req, res) => {
+  console.log(req.body);
+  res.send('Thank you');
 });
 
 async function start() {
