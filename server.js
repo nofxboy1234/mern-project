@@ -46,7 +46,8 @@ app.post(
   async (req, res) => {
     console.log(req.body);
     const info = await db.collection('animals').insertOne(req.cleanData);
-    // console.log(info);
+    console.log(info.insertedId);
+    console.log(req.cleanData);
     const newAnimal = await db
       .collection('animals')
       .findOne({ _id: new ObjectId(info.insertedId) });
