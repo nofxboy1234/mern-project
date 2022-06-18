@@ -36,6 +36,9 @@ app.get('/', async (req, res) => {
   const allAnimals = await db.collection('animals').find().toArray();
   const generatedHTML = ReactDOMServer.renderToString(
     <div className="container">
+      {!allAnimals.length && (
+        <p>There are not animals yet, the admin needs to add a few.</p>
+      )}
       <div className="animal-grid mb-3">
         {allAnimals.map((animal) => (
           <AnimalCard
