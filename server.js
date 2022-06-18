@@ -82,6 +82,39 @@ app.delete('/animal/:id', async (req, res) => {
   res.send('Good job');
 });
 
+app.post(
+  '/update-animal',
+  upload.single('photo'),
+  ourCleanup,
+  async (req, res) => {
+    if (req.file) {
+      const photofilename = `${Date.now()}.jpg`;
+      await sharp(req.file.buffer)
+        .resize(844, 456)
+        .jpeg({ quality: 60 })
+        .toFile(path.join('public', 'uploaded-photos', photofilename));
+      req.cleanData.photo = photofilename;
+      const info = await db
+        .collection('animals')
+        .findOneAndUpdate(
+          { _id: new ObjectId(req.body._id) },
+          { $set: req.cleanData }
+        );
+      if (info.value.photo) {
+        fse.remove(path.join('public', 'uploaded-photos', info.value.photo));
+      }
+      res.send(photofilename);
+    } else {
+      // if they are not uploading a new photo
+      db.collection('animals').findOneAndUpdate(
+        { _id: new ObjectId(req.body._id) },
+        { $set: req.cleanData }
+      );
+      res.send(false);
+    }
+  }
+);
+
 function ourCleanup(req, res, next) {
   if (typeof req.body.name != 'string') req.body.name = '';
   if (typeof req.body.species != 'string') req.body.species = '';
